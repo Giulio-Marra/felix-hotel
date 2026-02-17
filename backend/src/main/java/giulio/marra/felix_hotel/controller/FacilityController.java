@@ -40,11 +40,13 @@ public class FacilityController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public FacilityResponseDto updateFacility(@PathVariable Long id, @RequestBody @Valid NewFacilityRequiredDto body) {
         return facilityService.updateFacility(id, body);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String deleteFacility(@PathVariable Long id) {
         return facilityService.deleteFacilityById(id);
     }
