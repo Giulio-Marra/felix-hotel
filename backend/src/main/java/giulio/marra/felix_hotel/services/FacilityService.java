@@ -65,5 +65,10 @@ public class FacilityService {
         Facility updatedFacility = facilityRepository.save(existingFacility);
         return mapToResponseDto(updatedFacility);
     }
+    
+    public Facility findEntityById(Long facilityId) {
+        return facilityRepository.findById(facilityId)
+                .orElseThrow(() -> new RuntimeException("Facility con ID " + facilityId + " non trovata"));
+    }
 
 }
