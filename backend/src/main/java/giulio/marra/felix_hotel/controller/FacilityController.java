@@ -5,6 +5,7 @@ import giulio.marra.felix_hotel.dto.facility.NewFacilityRequiredDto;
 import giulio.marra.felix_hotel.services.FacilityService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,7 @@ public class FacilityController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('ADMIN')")
     public FacilityResponseDto createFacility(@RequestBody @Valid NewFacilityRequiredDto body) {
         return facilityService.saveNewFacility(body);
     }
