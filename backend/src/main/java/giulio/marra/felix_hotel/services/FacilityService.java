@@ -3,6 +3,9 @@ package giulio.marra.felix_hotel.services;
 import giulio.marra.felix_hotel.dto.facility.FacilityResponseDto;
 import giulio.marra.felix_hotel.dto.facility.NewFacilityRequiredDto;
 import giulio.marra.felix_hotel.entities.Facility;
+import giulio.marra.felix_hotel.exceptions.AlreadyExistException;
+import giulio.marra.felix_hotel.exceptions.BadRequestException;
+import giulio.marra.felix_hotel.exceptions.NotFoundException;
 import giulio.marra.felix_hotel.repository.FacilityRepository;
 import org.springframework.stereotype.Service;
 
@@ -26,12 +29,12 @@ public class FacilityService {
     public FacilityResponseDto findFacilityById(Long facilityId) {
         return facilityRepository.findById(facilityId)
                 .map(this::mapToResponseDto)
-                .orElseThrow(() -> new RuntimeException("Facility non trovata"));
+                .orElseThrow(() -> new NotFoundException("Facility non trovata"));
     }
 
     public FacilityResponseDto saveNewFacility(NewFacilityRequiredDto body) {
         if (facilityRepository.existsByName(body.name())) {
-            throw new RuntimeException("Facility gia esistente");
+            throw new AlreadyExistException("Facility gia esistente");
         }
         Facility facility = new Facility(body.name());
         Facility savedFacility = facilityRepository.save(facility);
@@ -40,7 +43,7 @@ public class FacilityService {
 
     public String deleteFacilityById(Long facilityId) {
         if (!facilityRepository.existsById(facilityId)) {
-            throw new RuntimeException("Impossibile eliminare: Facility con ID " + facilityId + " non trovata.");
+            throw new NotFoundException("Impossibile eliminare: Facility con ID " + facilityId + " non trovata.");
         }
         facilityRepository.deleteById(facilityId);
         return "Facility eliminata con successo!";
@@ -55,20 +58,20 @@ public class FacilityService {
 
     public FacilityResponseDto updateFacility(Long id, NewFacilityRequiredDto body) {
         Facility existingFacility = facilityRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Impossibile aggiornare: Facility non trovata"));
+                .orElseThrow(() -> new NotFoundException("Impossibile aggiornare: Facility non trovata"));
 
         if (facilityRepository.existsByName(body.name())) {
-            throw new RuntimeException("Esiste già un'altra facility con questo nome");
+            throw new BadRequestException("Esiste già un'altra facility con questo nome");
         }
 
         existingFacility.setName(body.name());
         Facility updatedFacility = facilityRepository.save(existingFacility);
         return mapToResponseDto(updatedFacility);
     }
-    
+
     public Facility findEntityById(Long facilityId) {
         return facilityRepository.findById(facilityId)
-                .orElseThrow(() -> new RuntimeException("Facility con ID " + facilityId + " non trovata"));
+                .orElseThrow(() -> new NotFoundException("Facility con ID " + facilityId + " non trovata"));
     }
 
 }

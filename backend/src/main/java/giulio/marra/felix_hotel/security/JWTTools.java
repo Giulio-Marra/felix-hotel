@@ -1,6 +1,7 @@
 package giulio.marra.felix_hotel.security;
 
 import giulio.marra.felix_hotel.entities.User;
+import giulio.marra.felix_hotel.exceptions.UnauthorizedException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +37,7 @@ public class JWTTools {
                     .parseClaimsJws(token);
         } catch (Exception ex) {
 
-            throw new RuntimeException("Token non valido o scaduto.");
+            throw new UnauthorizedException("Token non valido o scaduto.");
         }
     }
 

@@ -2,6 +2,7 @@ package giulio.marra.felix_hotel.services;
 
 import giulio.marra.felix_hotel.dto.user.UserResponseDto;
 import giulio.marra.felix_hotel.entities.User;
+import giulio.marra.felix_hotel.exceptions.NotFoundException;
 import giulio.marra.felix_hotel.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -26,12 +27,12 @@ public class UserService {
 
     public User findById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utente con id " + id + " non trovato"));
+                .orElseThrow(() -> new NotFoundException("Utente con id " + id + " non trovato"));
     }
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Utente con email " + email + " non trovato"));
+                .orElseThrow(() -> new NotFoundException("Utente con email " + email + " non trovato"));
     }
 
     public UserResponseDto findByMe(User user) {

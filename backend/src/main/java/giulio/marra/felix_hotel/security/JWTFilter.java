@@ -1,6 +1,7 @@
 package giulio.marra.felix_hotel.security;
 
 import giulio.marra.felix_hotel.entities.User;
+import giulio.marra.felix_hotel.exceptions.UnauthorizedException;
 import giulio.marra.felix_hotel.services.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -33,7 +34,7 @@ public class JWTFilter extends OncePerRequestFilter {
             String authHeader = request.getHeader("Authorization");
 
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                throw new RuntimeException("Per favore inserisci correttamente il token nell'header");
+                throw new UnauthorizedException("Per favore inserisci correttamente il token nell'header");
             }
 
             String accessToken = authHeader.substring(7);
@@ -66,7 +67,7 @@ public class JWTFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         AntPathMatcher pathMatcher = new AntPathMatcher();
         String path = request.getServletPath();
-        
+
         return pathMatcher.match("/auth/**", path) ||
                 pathMatcher.match("/api/public/**", path);
     }

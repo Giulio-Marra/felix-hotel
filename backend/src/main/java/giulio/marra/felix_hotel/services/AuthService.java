@@ -4,6 +4,8 @@ import giulio.marra.felix_hotel.dto.user.NewUserRequiredDto;
 import giulio.marra.felix_hotel.dto.user.UserResponseDto;
 import giulio.marra.felix_hotel.entities.User;
 import giulio.marra.felix_hotel.enums.Role;
+import giulio.marra.felix_hotel.exceptions.AlreadyExistException;
+import giulio.marra.felix_hotel.exceptions.BadRequestException;
 import giulio.marra.felix_hotel.repository.UserRepository;
 import giulio.marra.felix_hotel.security.JWTTools;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,13 +32,13 @@ public class AuthService {
         if (passwordEncoder.matches(password, user.getPassword())) {
             return jwtTools.createToken(user);
         } else {
-            throw new RuntimeException("Credenziali non valide! Riprova.");
+            throw new BadRequestException("Credenziali non valide! Riprova.");
         }
     }
 
     public UserResponseDto save(NewUserRequiredDto body) {
         if (userRepository.existsByEmail(body.email())) {
-            throw new RuntimeException("L'email " + body.email() + " è già registrata!");
+            throw new AlreadyExistException("L'email " + body.email() + " è già registrata!");
         }
 
         User newUser = new User();

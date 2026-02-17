@@ -5,6 +5,8 @@ import giulio.marra.felix_hotel.dto.room.NewRoomRequiredDto;
 import giulio.marra.felix_hotel.dto.room.RoomResponseDto;
 import giulio.marra.felix_hotel.entities.Facility;
 import giulio.marra.felix_hotel.entities.Room;
+import giulio.marra.felix_hotel.exceptions.BadRequestException;
+import giulio.marra.felix_hotel.exceptions.NotFoundException;
 import giulio.marra.felix_hotel.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +59,7 @@ public class RoomService {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException("Errore critico durante l'upload delle immagini: " + e.getMessage());
+            throw new BadRequestException("Errore critico durante l'upload delle immagini: " + e.getMessage());
         }
 
 
@@ -90,7 +92,7 @@ public class RoomService {
 
     public RoomResponseDto findRoomById(Long id) {
         Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Stanza non trovata con ID: " + id));
+                .orElseThrow(() -> new NotFoundException("Stanza non trovata con ID: " + id));
         return mapToResponseDto(room);
     }
 
@@ -98,14 +100,14 @@ public class RoomService {
     @Transactional
     public String deleteRoom(Long id) {
         Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Impossibile eliminare: Stanza non trovata"));
-        
+                .orElseThrow(() -> new NotFoundException("Impossibile eliminare: Stanza non trovata"));
+
         if (room.getImageUrls() != null) {
             for (String url : room.getImageUrls()) {
                 try {
                     cloudinaryService.deleteImage(url);
                 } catch (IOException e) {
-                    System.err.println("Errore rimozione immagine Cloudinary: " + url);
+                    throw new BadRequestException("Errore durante la pulizia delle immagini su Cloudinary: " + e.getMessage());
                 }
             }
         }
@@ -117,7 +119,7 @@ public class RoomService {
     @Transactional
     public RoomResponseDto updateRoom(Long id, NewRoomRequiredDto body) {
         Room existingRoom = roomRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Stanza non trovata per l'aggiornamento"));
+                .orElseThrow(() -> new NotFoundException("Stanza non trovata per l'aggiornamento"));
 
         List<Facility> facilities = body.facilitiesIds().stream()
                 .map(facilityService::findEntityById)
