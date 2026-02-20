@@ -3,16 +3,18 @@ package giulio.marra.felix_hotel.services;
 import giulio.marra.felix_hotel.dto.facility.FacilityResponseDto;
 import giulio.marra.felix_hotel.dto.room.NewRoomRequiredDto;
 import giulio.marra.felix_hotel.dto.room.RoomResponseDto;
-import giulio.marra.felix_hotel.entities.Facility;
+import giulio.marra.felix_hotel.dto.room.RoomSearchFilterDto;
 import giulio.marra.felix_hotel.entities.Room;
 import giulio.marra.felix_hotel.exceptions.BadRequestException;
 import giulio.marra.felix_hotel.exceptions.NotFoundException;
+import giulio.marra.felix_hotel.repository.BookingItemRepository;
 import giulio.marra.felix_hotel.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,20 +23,32 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final CloudinaryService cloudinaryService;
     private final FacilityService facilityService;
+    private final BookingItemRepository bookingItemRepository;
 
     public RoomService(RoomRepository roomRepository,
                        CloudinaryService cloudinaryService,
-                       FacilityService facilityService) {
+                       FacilityService facilityService,
+                       BookingItemRepository bookingItemRepository) {
         this.roomRepository = roomRepository;
         this.cloudinaryService = cloudinaryService;
         this.facilityService = facilityService;
+        this.bookingItemRepository = bookingItemRepository;
     }
 
-    private RoomResponseDto mapToResponseDto(Room room) {
+    private RoomResponseDto mapToResponseDto(Room room, LocalDate checkIn, LocalDate checkOut) {
+        int availableNow = room.getTotalUnits();
+
+        if (checkIn != null && checkOut != null) {
+            Integer occupied = bookingItemRepository.countConfirmedOccupiedUnits(room.getId(), checkIn, checkOut);
+            availableNow = room.getTotalUnits() - (occupied != null ? occupied : 0);
+        }
+
         return new RoomResponseDto(
                 room.getId(),
                 room.getNameRoom(),
                 room.getMaxOccupancy(),
+                room.getTotalUnits(),
+                Math.max(0, availableNow),
                 room.getDescription(),
                 room.getImageUrls(),
                 room.getPriceForNight(),
@@ -47,93 +61,94 @@ public class RoomService {
         );
     }
 
-    @Transactional
-    public RoomResponseDto saveNewRoom(NewRoomRequiredDto body, List<MultipartFile> images) {
-        List<String> imageUrls = new ArrayList<>();
 
-        try {
-            if (images != null && !images.isEmpty()) {
-                for (MultipartFile file : images) {
-                    String url = cloudinaryService.uploadImage(file);
-                    imageUrls.add(url);
-                }
-            }
-        } catch (IOException e) {
-            throw new BadRequestException("Errore critico durante l'upload delle immagini: " + e.getMessage());
+    public List<RoomResponseDto> findAvailableRooms(RoomSearchFilterDto filter) {
+        if (filter.checkIn() == null || filter.checkOut() == null) {
+            throw new BadRequestException("Le date sono obbligatorie.");
         }
 
-
-        List<Facility> facilities = body.facilitiesIds().stream()
-                .map(facilityService::findEntityById)
+        return roomRepository.findAvailableRooms(
+                        filter.checkIn(),
+                        filter.checkOut(),
+                        filter.roomType(),
+                        filter.guests()
+                ).stream()
+                .map(room -> mapToResponseDto(room, filter.checkIn(), filter.checkOut()))
                 .toList();
-
-
-        Room newRoom = new Room();
-        newRoom.setNameRoom(body.nameRoom());
-        newRoom.setMaxOccupancy(body.maxOccupancy());
-        newRoom.setDescription(body.description());
-        newRoom.setPriceForNight(body.priceForNight());
-        newRoom.setDiscountPercentage(body.discountPercentage());
-        newRoom.setAvailable(body.isAvailable());
-        newRoom.setRoomType(body.roomType());
-        newRoom.setImageUrls(imageUrls);
-        newRoom.setFacilities(facilities);
-
-        return mapToResponseDto(roomRepository.save(newRoom));
     }
 
 
     public List<RoomResponseDto> findAllRooms() {
         return roomRepository.findAll().stream()
-                .map(this::mapToResponseDto)
+                .map(room -> mapToResponseDto(room, null, null))
                 .toList();
     }
 
-
     public RoomResponseDto findRoomById(Long id) {
-        Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Stanza non trovata con ID: " + id));
-        return mapToResponseDto(room);
+        Room room = findById(id);
+        return mapToResponseDto(room, null, null);
     }
 
+    public Room findById(Long id) {
+        return roomRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Stanza non trovata"));
+    }
 
     @Transactional
-    public String deleteRoom(Long id) {
-        Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Impossibile eliminare: Stanza non trovata"));
-
-        if (room.getImageUrls() != null) {
-            for (String url : room.getImageUrls()) {
-                try {
-                    cloudinaryService.deleteImage(url);
-                } catch (IOException e) {
-                    throw new BadRequestException("Errore durante la pulizia delle immagini su Cloudinary: " + e.getMessage());
+    public RoomResponseDto saveNewRoom(NewRoomRequiredDto body, List<MultipartFile> images) {
+        List<String> imageUrls = new ArrayList<>();
+        try {
+            if (images != null) {
+                for (MultipartFile file : images) {
+                    imageUrls.add(cloudinaryService.uploadImage(file));
                 }
             }
+        } catch (IOException e) {
+            throw new BadRequestException("Errore upload immagini");
         }
 
-        roomRepository.delete(room);
-        return "Stanza " + id + " e relative immagini eliminate correttamente.";
+        Room room = new Room();
+        room.setNameRoom(body.nameRoom());
+        room.setMaxOccupancy(body.maxOccupancy());
+        room.setTotalUnits(body.totalUnits());
+        room.setDescription(body.description());
+        room.setPriceForNight(body.priceForNight());
+        room.setDiscountPercentage(body.discountPercentage());
+        room.setAvailable(body.isAvailable());
+        room.setRoomType(body.roomType());
+
+        room.setImageUrls(imageUrls);
+        room.setFacilities(body.facilitiesIds().stream()
+                .map(facilityService::findEntityById)
+                .toList());
+
+        return mapToResponseDto(roomRepository.save(room), null, null);
     }
 
     @Transactional
     public RoomResponseDto updateRoom(Long id, NewRoomRequiredDto body) {
-        Room existingRoom = roomRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Stanza non trovata per l'aggiornamento"));
+        Room existing = findById(id);
+        
+        existing.setNameRoom(body.nameRoom());
+        existing.setMaxOccupancy(body.maxOccupancy());
+        existing.setTotalUnits(body.totalUnits());
+        existing.setDescription(body.description());
+        existing.setPriceForNight(body.priceForNight());
+        existing.setDiscountPercentage(body.discountPercentage());
+        existing.setAvailable(body.isAvailable());
+        existing.setRoomType(body.roomType());
 
-        List<Facility> facilities = body.facilitiesIds().stream()
+        existing.setFacilities(body.facilitiesIds().stream()
                 .map(facilityService::findEntityById)
-                .toList();
+                .toList());
 
-        existingRoom.setNameRoom(body.nameRoom());
-        existingRoom.setMaxOccupancy(body.maxOccupancy());
-        existingRoom.setDescription(body.description());
-        existingRoom.setPriceForNight(body.priceForNight());
-        existingRoom.setDiscountPercentage(body.discountPercentage());
-        existingRoom.setAvailable(body.isAvailable());
-        existingRoom.setRoomType(body.roomType());
-        existingRoom.setFacilities(facilities);
+        return mapToResponseDto(roomRepository.save(existing), null, null);
+    }
 
-        return mapToResponseDto(roomRepository.save(existingRoom));
+    @Transactional
+    public String deleteRoom(Long id) {
+        Room room = findById(id);
+        roomRepository.delete(room);
+        return "Eliminata";
     }
 }

@@ -13,6 +13,7 @@ public class Room {
 
     private String nameRoom;
     private Integer maxOccupancy;
+    private Integer totalUnits;
 
     @Column(length = 1000)
     private String description;
@@ -40,9 +41,10 @@ public class Room {
     public Room() {
     }
 
-    public Room(String nameRoom, Integer maxOccupancy, String description, List<String> imageUrls, Double priceForNight, Double discountPercentage, Boolean isAvailable, RoomType roomType, List<Facility> facilities) {
+    public Room(String nameRoom, Integer maxOccupancy, Integer totalUnits, String description, List<String> imageUrls, Double priceForNight, Double discountPercentage, Boolean isAvailable, RoomType roomType, List<Facility> facilities) {
         this.nameRoom = nameRoom;
         this.maxOccupancy = maxOccupancy;
+        this.totalUnits = totalUnits;
         this.description = description;
         this.imageUrls = imageUrls;
         this.priceForNight = priceForNight;
@@ -130,5 +132,13 @@ public class Room {
 
     public void setDiscountPercentage(Double discountPercentage) {
         this.discountPercentage = discountPercentage;
+    }
+
+    public Integer getTotalUnits() {
+        return totalUnits;
+    }
+
+    public void setTotalUnits(Integer totalUnits) {
+        this.totalUnits = totalUnits;
     }
 }

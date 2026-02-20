@@ -14,6 +14,10 @@ public record NewRoomRequiredDto(
         @Min(value = 1, message = "La camera deve ospitare almeno una persona")
         Integer maxOccupancy,
 
+        @NotNull(message = "Il nuimero massimo di quella stanza è obbligatoria")
+        @Min(value = 1, message = "La camera deve essere alemno una")
+        Integer totalUnits,
+
         @NotBlank(message = "La descrizione è obbligatoria")
         @Size(max = 1000, message = "La descrizione non può superare i 1000 caratteri")
         String description,

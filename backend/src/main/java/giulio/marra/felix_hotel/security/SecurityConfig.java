@@ -27,26 +27,30 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/rooms/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/facilities/**").permitAll()
                         .anyRequest().authenticated()
                 )
+                // --- AGGIUNGI QUESTO BLOCCO ---
                 .exceptionHandling(ex -> ex
+                        // Caso 1: L'utente NON è loggato (Manca il Token)
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Non autenticato\", \"message\": \"Devi effettuare il login per accedere a questa risorsa.\"}");
+                        })
+                        // Caso 2: L'utente è loggato ma NON è ADMIN (Token presente ma ruolo sbagliato)
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                            response.setContentType("application/json;charset=UTF-8");
-                            response.getWriter().write(
-                                    "{\"error\": \"Accesso negato\", " +
-                                            "\"message\": \"Non hai le autorizzazioni necessarie per accedere a questa risorsa.\"}"
-                            );
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Accesso negato\", \"message\": \"Non hai i permessi di Amministratore per eseguire questa operazione.\"}");
                         })
                 );
 
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 

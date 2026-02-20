@@ -9,6 +9,8 @@ public record RoomResponseDto(
         Long id,
         String nameRoom,
         Integer maxOccupancy,
+        Integer totalUnits,
+        Integer availableUnits,
         String description,
         List<String> imageUrls,
         Double priceForNight,

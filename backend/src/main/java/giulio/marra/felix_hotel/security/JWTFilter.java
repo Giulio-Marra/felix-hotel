@@ -1,7 +1,6 @@
 package giulio.marra.felix_hotel.security;
 
 import giulio.marra.felix_hotel.entities.User;
-import giulio.marra.felix_hotel.exceptions.UnauthorizedException;
 import giulio.marra.felix_hotel.services.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -30,36 +29,32 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        String authHeader = request.getHeader("Authorization");
+
+        // Se il token manca o è malformato, NON lanciare eccezioni.
+        // Passa semplicemente al filtro successivo.
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
-            String authHeader = request.getHeader("Authorization");
-
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                throw new UnauthorizedException("Per favore inserisci correttamente il token nell'header");
-            }
-
             String accessToken = authHeader.substring(7);
             jwtTools.validateToken(accessToken);
-
             String id = jwtTools.extractIdFromToken(accessToken);
             User user = userService.findById(Long.parseLong(id));
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(
-                    user,
-                    null,
-                    user.getAuthorities()
+                    user, null, user.getAuthorities()
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
 
-        } catch (RuntimeException e) {
-            SecurityContextHolder.clearContext();
+        } catch (Exception e) {
+            // Qui lanci l'errore solo se il token c'è ma è SCADUTO o MANOMESSO
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(
-                    "{\"error\": \"Autenticazione fallita\", " +
-                            "\"message\": \"" + e.getMessage() + "\"}"
-            );
+            response.getWriter().write("{\"error\": \"Token non valido\"}");
         }
     }
 
@@ -68,7 +63,6 @@ public class JWTFilter extends OncePerRequestFilter {
         AntPathMatcher pathMatcher = new AntPathMatcher();
         String path = request.getServletPath();
 
-        return pathMatcher.match("/auth/**", path) ||
-                pathMatcher.match("/api/public/**", path);
+        return pathMatcher.match("/auth/**", path);
     }
 }
