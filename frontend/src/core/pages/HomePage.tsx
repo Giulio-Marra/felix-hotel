@@ -1,7 +1,11 @@
 import SearchRoomForm from "../components/SearchRoomForm";
 import ServiceCard from "../components/ServiceCard";
 import ReviewCard from "../components/ReviewCard";
-import RoomCardHomePage from "../components/RoomCardHomePage";
+import { FallingLines } from "react-loader-spinner";
+import { useEffect, useState } from "react";
+import type { RoomResponse } from "../../features/rooms/interfaces/roomInterface";
+import { getAllRooms } from "../../features/rooms/services/roomServices";
+import RoomHomePageCard from "../components/RoomHomePageCard";
 
 const reviews = [
   {
@@ -22,6 +26,46 @@ const reviews = [
 ];
 
 const HomePage = () => {
+  const [rooms, setRooms] = useState<RoomResponse[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadRooms = async () => {
+      try {
+        setLoading(true);
+        const data = await getAllRooms();
+        setRooms(data);
+      } catch (err: any) {
+        setError(
+          "Ops! Non siamo riusciti a caricare le camere del Felix Hotel.",
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRooms();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-white">
+        <div className="flex flex-col items-center">
+          <FallingLines
+            color="#d97706"
+            width="100"
+            visible={true}
+            ariaLabel="falling-circles-loading"
+          />
+          <p className="mt-4 text-amber-600 font-medium tracking-widest animate-pulse">
+            PREPARANDO IL TUO SOGGIORNO...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="home-page-container ">
       <div className="hero-container">
@@ -132,21 +176,13 @@ const HomePage = () => {
               </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              <RoomCardHomePage
-                title="Junior Suite Vista Mare"
-                features="45mq • Letto King Size • Balcone Privato"
-                price={250}
-                imageUrl="https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=1074"
-                delay="0"
-              />
-
-              <RoomCardHomePage
-                title="Presidential Suite"
-                features="120mq • Jacuzzi Privata • Area Living"
-                price={550}
-                imageUrl="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1070"
-                delay="200"
-              />
+              {rooms.slice(0, 2).map((room, index) => (
+                <RoomHomePageCard
+                  key={room.id}
+                  room={room}
+                  delay={(index * 200).toString()}
+                />
+              ))}
             </div>
           </div>
         </div>

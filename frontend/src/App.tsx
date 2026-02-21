@@ -5,6 +5,7 @@ import "./App.css";
 import HomePage from "./core/pages/HomePage";
 import MainLayout from "./core/layouts/MainLayout";
 import { useEffect } from "react";
+import ErrorPage from "./core/pages/ErrorPage";
 
 function App() {
   useEffect(() => {
@@ -20,6 +21,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
         </Route>
+        <Route path="/server-down" element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
   );
