@@ -30,6 +30,7 @@ axiosInstance.interceptors.response.use(
           break;
         case 404:
           console.error("Risorsa non trovata");
+           window.location.href = '/not-found';
           break;
         case 500:
           console.error("Errore interno del server Felix Hotel");

@@ -54,7 +54,7 @@ public class RoomController {
 
     // --- ADMIN: Aggiornamento stanza ---
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public RoomResponseDto updateRoom(
             @PathVariable Long id,
             @RequestBody @Valid NewRoomRequiredDto body) {
@@ -63,7 +63,7 @@ public class RoomController {
 
     // --- ADMIN: Eliminazione stanza ---
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String deleteRoom(@PathVariable Long id) {
         return roomService.deleteRoom(id);
     }

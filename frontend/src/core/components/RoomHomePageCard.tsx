@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router";
 import type { RoomResponse } from "../../features/rooms/interfaces/roomInterface";
 
 interface RoomCardHomePageProps {
@@ -6,11 +7,13 @@ interface RoomCardHomePageProps {
 }
 
 const RoomHomePageCard = ({ room, delay }: RoomCardHomePageProps) => {
+  const navigate = useNavigate();
   return (
     <div
       className="group cursor-pointer"
       data-aos="fade-up"
       data-aos-delay={delay}
+      onClick={() => navigate(`/room/details/${room.id}`)}
     >
       <div className="overflow-hidden mb-4 rounded-sm shadow-lg">
         <img

@@ -28,7 +28,7 @@ const reviews = [
 const HomePage = () => {
   const [rooms, setRooms] = useState<RoomResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadRooms = async () => {
@@ -36,9 +36,9 @@ const HomePage = () => {
         setLoading(true);
         const data = await getAllRooms();
         setRooms(data);
-      } catch (err: any) {
+      } catch (err: unknown) {
         setError(
-          "Ops! Non siamo riusciti a caricare le camere del Felix Hotel.",
+          err + "Ops! Non siamo riusciti a caricare le camere del Felix Hotel.",
         );
       } finally {
         setLoading(false);
@@ -176,13 +176,24 @@ const HomePage = () => {
               </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              {rooms.slice(0, 2).map((room, index) => (
-                <RoomHomePageCard
-                  key={room.id}
-                  room={room}
-                  delay={(index * 200).toString()}
-                />
-              ))}
+              {rooms.length > 0 ? (
+                rooms
+                  .slice(0, 2)
+                  .map((room, index) => (
+                    <RoomHomePageCard
+                      key={room.id}
+                      room={room}
+                      delay={(index * 200).toString()}
+                    />
+                  ))
+              ) : (
+                <div className="col-span-2 text-center py-10 border-2 border-dashed border-amber-200 rounded-xl">
+                  <p className="text-gray-500 italic">
+                    Stiamo aggiornando le nostre suite esclusive. Contattaci
+                    direttamente per conoscere le disponibilità attuali.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -77,7 +77,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleEnumError(HttpMessageNotReadableException ex, HttpServletRequest request) {
-        String error = "Valore non valido inserito nel JSON. Controlla i tipi (es. RoomType o Enum).";
+        ex.getMostSpecificCause();
+        String detailedError = ex.getMostSpecificCause().getMessage();
+        String error = "Errore nel formato JSON: " + detailedError;
+
         return new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
