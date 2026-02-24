@@ -13,6 +13,9 @@ import NotFoundPage from "./core/pages/NotFoundPage";
 import RoomsAndSuitePage from "./features/rooms/pages/RoomsAndSuitePage";
 import AboutPage from "./core/pages/AboutPage";
 import SearchRoomPage from "./features/rooms/pages/SearchRoomPage";
+import AuthLayout from "./core/layouts/AuthLayout";
+import LoginPage from "./features/auth/pages/LoginPage";
+import RegisterPage from "./features/auth/pages/RegisterPage";
 
 function App() {
   useEffect(() => {
@@ -22,6 +25,7 @@ function App() {
       easing: "ease-in-out",
     });
   }, []);
+
   return (
     <BrowserRouter>
       <Routes>
@@ -31,6 +35,10 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/room/details/:id" element={<RoomDetailsPage />} />
           <Route path="/search-room" element={<SearchRoomPage />} />
+        </Route>
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
         </Route>
         <Route path="/server-down" element={<ErrorPage />} />
         <Route path="/not-found" element={<NotFoundPage />} />

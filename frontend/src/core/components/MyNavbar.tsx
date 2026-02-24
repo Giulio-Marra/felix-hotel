@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { BiMenu } from "react-icons/bi";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const MyNavbar = () => {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
@@ -48,7 +49,10 @@ const MyNavbar = () => {
           ))}
         </div>
         <div className="hidden lg:flex flex-1 justify-end">
-          <div className="cursor-pointer font-bold border-2 border-current px-6 py-2 hover:bg-amber-600 hover:text-white transition-all text-sm uppercase tracking-widest">
+          <div
+            className="cursor-pointer font-bold border-2 border-current px-6 py-2 hover:bg-amber-600 hover:text-white transition-all text-sm uppercase tracking-widest"
+            onClick={() => navigate("/login")}
+          >
             LOGIN
           </div>
         </div>
@@ -76,7 +80,10 @@ const MyNavbar = () => {
             </NavLink>
           ))}
           <div className="mt-4 w-3/4">
-            <div className="cursor-pointer font-bold border-2 border-amber-600 text-amber-600 px-6 py-3 text-center uppercase tracking-widest text-sm hover:bg-amber-600 hover:text-white transition-all">
+            <div
+              className="cursor-pointer font-bold border-2 border-amber-600 text-amber-600 px-6 py-3 text-center uppercase tracking-widest text-sm hover:bg-amber-600 hover:text-white transition-all"
+              onClick={() => navigate("/login")}
+            >
               LOGIN
             </div>
           </div>
