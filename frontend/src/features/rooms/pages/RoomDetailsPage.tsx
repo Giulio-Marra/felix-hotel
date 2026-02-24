@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import type { RoomResponse } from "../interfaces/roomInterface";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { getRoomById } from "../services/roomServices";
-import { FallingLines } from "react-loader-spinner";
-import Carousel from "../interfaces/Carousel";
+import Carousel from "../components/Carousel";
+import MyLoader from "../../../core/components/MyLoader";
 
 const RoomDetailsPage = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [room, setRoom] = useState<RoomResponse>();
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  console.log(room);
+  const [, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadRoom = async () => {
@@ -20,34 +19,24 @@ const RoomDetailsPage = () => {
         const data = await getRoomById(id);
         setRoom(data);
       } catch (error) {
+        const err = error as { status?: number };
         setError(
           error +
             "Ops! Non siamo riusciti a caricare le camere del Felix Hotel.",
         );
+        if (err.status === 404) {
+          navigate("/not-found");
+        }
       } finally {
         setLoading(false);
       }
     };
 
     loadRoom();
-  }, [id]);
+  }, [id, navigate]);
 
   if (loading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-white">
-        <div className="flex flex-col items-center">
-          <FallingLines
-            color="#d97706"
-            width="100"
-            visible={true}
-            ariaLabel="falling-circles-loading"
-          />
-          <p className="mt-4 text-amber-600 font-medium tracking-widest animate-pulse">
-            PREPARANDO IL TUO SOGGIORNO...
-          </p>
-        </div>
-      </div>
-    );
+    return <MyLoader text="CARICANDO I DETTAGLI DELLA TUA CAMERA..." />;
   }
 
   return (

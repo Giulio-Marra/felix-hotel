@@ -64,7 +64,7 @@ public class RoomService {
 
     public List<RoomResponseDto> findAvailableRooms(RoomSearchFilterDto filter) {
         if (filter.checkIn() == null || filter.checkOut() == null) {
-            throw new BadRequestException("Le date sono obbligatorie.");
+            throw new BadRequestException("Seleziona le date del soggiorno.");
         }
 
         if (filter.checkIn().isBefore(LocalDate.now())) {

@@ -1,11 +1,12 @@
-import SearchRoomForm from "../components/SearchRoomForm";
+import SearchRoomForm from "../../features/rooms/components/SearchRoomForm";
 import ServiceCard from "../components/ServiceCard";
 import ReviewCard from "../components/ReviewCard";
-import { FallingLines } from "react-loader-spinner";
 import { useEffect, useState } from "react";
 import type { RoomResponse } from "../../features/rooms/interfaces/roomInterface";
 import { getAllRooms } from "../../features/rooms/services/roomServices";
-import RoomHomePageCard from "../components/RoomHomePageCard";
+import RoomHomePageCard from "../../features/rooms/components/RoomCard";
+import { useNavigate } from "react-router-dom";
+import MyLoader from "../components/MyLoader";
 
 const reviews = [
   {
@@ -26,6 +27,7 @@ const reviews = [
 ];
 
 const HomePage = () => {
+  const navigate = useNavigate();
   const [rooms, setRooms] = useState<RoomResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [, setError] = useState<string | null>(null);
@@ -49,21 +51,7 @@ const HomePage = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-white">
-        <div className="flex flex-col items-center">
-          <FallingLines
-            color="#d97706"
-            width="100"
-            visible={true}
-            ariaLabel="falling-circles-loading"
-          />
-          <p className="mt-4 text-amber-600 font-medium tracking-widest animate-pulse">
-            PREPARANDO IL TUO SOGGIORNO...
-          </p>
-        </div>
-      </div>
-    );
+    return <MyLoader text="CARICANDO LA TUA ESPERIENZA..." />;
   }
 
   return (
@@ -85,9 +73,11 @@ const HomePage = () => {
         </div>
       </div>
       <div>
-        <SearchRoomForm />
+        <div className="p-4">
+          <SearchRoomForm />
+        </div>
         <div className="py-20 ">
-          <div className="container mx-auto flex">
+          <div className="container mx-auto flex flex-col md:flex-row items-center gap-10">
             <div
               className="flex-1 flex flex-col px-10 gap-6"
               data-aos="fade-right"
@@ -171,7 +161,10 @@ const HomePage = () => {
                 </h4>
                 <h2 className="text-5xl font-bold mt-2">Le Nostre Camere</h2>
               </div>
-              <button className="border-b-2 border-amber-600 pb-1 font-bold hover:text-amber-700 transition-all uppercase text-sm tracking-widest">
+              <button
+                className="cursor-pointer border-b-2 border-amber-600 pb-1 font-bold hover:text-amber-700 transition-all uppercase text-sm tracking-widest"
+                onClick={() => navigate("/rooms-suite")}
+              >
                 Vedi tutte le camere
               </button>
             </div>
@@ -241,7 +234,10 @@ const HomePage = () => {
               Prenota oggi stesso la tua camera e assicurati la migliore tariffa
               garantita.
             </p>
-            <button className="bg-amber-600 hover:bg-amber-700 text-white px-10 py-4 font-bold uppercase tracking-widest transition-all">
+            <button
+              className="cursor-pointer bg-amber-600 hover:bg-amber-700 text-white px-10 py-4 font-bold uppercase tracking-widest transition-all"
+              onClick={() => navigate("/search-room")}
+            >
               Prenota Ora
             </button>
           </div>

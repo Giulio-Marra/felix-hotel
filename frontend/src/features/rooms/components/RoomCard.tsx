@@ -1,12 +1,7 @@
 import { useNavigate } from "react-router";
-import type { RoomResponse } from "../../features/rooms/interfaces/roomInterface";
+import type { RoomCardProps } from "../interfaces/roomInterface";
 
-interface RoomCardHomePageProps {
-  room: RoomResponse;
-  delay?: string;
-}
-
-const RoomHomePageCard = ({ room, delay }: RoomCardHomePageProps) => {
+const RoomCard = ({ room, delay }: RoomCardProps) => {
   const navigate = useNavigate();
   return (
     <div
@@ -23,7 +18,7 @@ const RoomHomePageCard = ({ room, delay }: RoomCardHomePageProps) => {
               : "https://via.placeholder.com/400"
           }
           alt={room.nameRoom}
-          className="w-full h-[400px] object-cover transition-transform duration-500 group-hover:scale-105"
+          className="w-full h-100 object-cover transition-transform duration-500 group-hover:scale-105"
         />
       </div>
 
@@ -42,4 +37,4 @@ const RoomHomePageCard = ({ room, delay }: RoomCardHomePageProps) => {
   );
 };
 
-export default RoomHomePageCard;
+export default RoomCard;

@@ -24,3 +24,8 @@ export interface RoomSearchFilter {
   roomType?: string;  
   guests?: number;   
 }
+
+export interface RoomCardProps {
+  room: RoomResponse;
+  delay?: string;
+}

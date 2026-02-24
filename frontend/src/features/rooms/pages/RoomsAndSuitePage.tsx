@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import type { RoomResponse } from "../interfaces/roomInterface";
 import { getAllRooms } from "../services/roomServices";
-import { FallingLines } from "react-loader-spinner";
-import RoomHomePageCard from "../../../core/components/RoomHomePageCard";
+import RoomHomePageCard from "../components/RoomCard";
+import MyLoader from "../../../core/components/MyLoader";
 
 const RoomsAndSuitePage = () => {
   const [rooms, setRooms] = useState<RoomResponse[]>();
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
 
   console.log(rooms);
 
@@ -28,19 +28,7 @@ const RoomsAndSuitePage = () => {
 
   if (loading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-white">
-        <div className="flex flex-col items-center">
-          <FallingLines
-            color="#d97706"
-            width="100"
-            visible={true}
-            ariaLabel="falling-circles-loading"
-          />
-          <p className="mt-4 text-amber-600 font-medium tracking-widest animate-pulse">
-            PREPARANDO IL TUO SOGGIORNO...
-          </p>
-        </div>
-      </div>
+      <MyLoader text="CARICANDO LE CAMERE E LE SUITE DEL FELIX HOTEL..." />
     );
   }
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { RoomSearchFilter } from "../../features/rooms/interfaces/roomInterface";
+import type { RoomSearchFilter } from "../interfaces/roomInterface";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const SearchRoomForm = () => {

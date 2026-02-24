@@ -8,7 +8,7 @@ interface ServiceCardProps {
 const ServiceCard = ({ imageUrl, title, text, delay }: ServiceCardProps) => {
   return (
     <div
-      className="group relative h-[500px] overflow-hidden rounded-sm shadow-xl"
+      className="group relative h-125 overflow-hidden rounded-sm shadow-xl"
       data-aos="fade-up"
       data-aos-delay={delay}
     >
