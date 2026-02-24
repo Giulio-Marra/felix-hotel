@@ -10,6 +10,9 @@ import { useEffect } from "react";
 import ErrorPage from "./core/pages/ErrorPage";
 import RoomDetailsPage from "./features/rooms/pages/RoomDetailsPage";
 import NotFoundPage from "./core/pages/NotFoundPage";
+import RoomsAndSuitePage from "./features/rooms/pages/RoomsAndSuitePage";
+import AboutPage from "./core/pages/AboutPage";
+import SearchRoomPage from "./features/rooms/pages/SearchRoomPage";
 
 function App() {
   useEffect(() => {
@@ -24,7 +27,10 @@ function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/rooms-suite" element={<RoomsAndSuitePage />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/room/details/:id" element={<RoomDetailsPage />} />
+          <Route path="/search-room" element={<SearchRoomPage />} />
         </Route>
         <Route path="/server-down" element={<ErrorPage />} />
         <Route path="/not-found" element={<NotFoundPage />} />

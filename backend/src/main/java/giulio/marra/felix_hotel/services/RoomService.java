@@ -67,6 +67,14 @@ public class RoomService {
             throw new BadRequestException("Le date sono obbligatorie.");
         }
 
+        if (filter.checkIn().isBefore(LocalDate.now())) {
+            throw new BadRequestException("La data di check-in non può essere precedente a oggi.");
+        }
+
+        if (!filter.checkOut().isAfter(filter.checkIn())) {
+            throw new BadRequestException("La data di check-out deve essere successiva a quella di check-in.");
+        }
+
         return roomRepository.findAvailableRooms(
                         filter.checkIn(),
                         filter.checkOut(),
@@ -128,7 +136,7 @@ public class RoomService {
     @Transactional
     public RoomResponseDto updateRoom(Long id, NewRoomRequiredDto body) {
         Room existing = findById(id);
-        
+
         existing.setNameRoom(body.nameRoom());
         existing.setMaxOccupancy(body.maxOccupancy());
         existing.setTotalUnits(body.totalUnits());

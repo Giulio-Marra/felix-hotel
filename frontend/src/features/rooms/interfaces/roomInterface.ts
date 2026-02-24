@@ -17,3 +17,10 @@ export interface RoomResponse {
   roomType: string;
   facilities: Facility[];
 }
+
+export interface RoomSearchFilter {
+  checkIn: string;    
+  checkOut: string;  
+  roomType?: string;  
+  guests?: number;   
+}

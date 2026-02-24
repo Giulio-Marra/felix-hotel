@@ -21,6 +21,10 @@ axiosInstance.interceptors.response.use(
       const data = error.response.data;
 
       switch (status) {
+         case 400:
+          const badRequestMsg = data.message || "Dati non validi";
+          return Promise.reject(new Error(badRequestMsg));
+         
         case 401:
           console.error("Sessione scaduta o non autorizzata");
           // Qui potresti reindirizzare l'utente al login
