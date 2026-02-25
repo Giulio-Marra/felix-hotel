@@ -23,25 +23,21 @@ public class RoomController {
         this.roomService = roomService;
     }
 
-    // --- PUBBLICO: Ricerca stanze con filtri (Date, Tipo, Ospiti) ---
     @GetMapping("/search")
     public List<RoomResponseDto> findAvailableRooms(@Valid RoomSearchFilterDto filter) {
         return roomService.findAvailableRooms(filter);
     }
 
-    // --- PUBBLICO: Lista completa di tutte le stanze (Catalogo) ---
     @GetMapping
     public List<RoomResponseDto> getAllRooms() {
         return roomService.findAllRooms();
     }
 
-    // --- PUBBLICO: Dettaglio singola stanza ---
     @GetMapping("/{id}")
     public RoomResponseDto getRoomById(@PathVariable Long id) {
         return roomService.findRoomById(id);
     }
 
-    // --- ADMIN: Salvataggio nuova stanza con immagini ---
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
@@ -51,7 +47,6 @@ public class RoomController {
         return roomService.saveNewRoom(body, images);
     }
 
-    // --- ADMIN: Aggiornamento stanza ---
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public RoomResponseDto updateRoom(
@@ -60,7 +55,6 @@ public class RoomController {
         return roomService.updateRoom(id, body);
     }
 
-    // --- ADMIN: Eliminazione stanza ---
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public String deleteRoom(@PathVariable Long id) {

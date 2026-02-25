@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { BiMenu } from "react-icons/bi";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../features/auth/hooks/useAuth";
+import { FaUserCircle } from "react-icons/fa";
 
 const MyNavbar = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -37,7 +40,10 @@ const MyNavbar = () => {
     >
       <div className="container mx-auto px-6 flex justify-between items-center">
         <div className="flex-1">
-          <h1 className="text-2xl lg:text-3xl font-bold tracking-tighter">
+          <h1
+            className="text-2xl lg:text-3xl font-bold tracking-tighter cursor-pointer"
+            onClick={() => navigate("/")}
+          >
             FELIX HOTEL
           </h1>
         </div>
@@ -49,12 +55,22 @@ const MyNavbar = () => {
           ))}
         </div>
         <div className="hidden lg:flex flex-1 justify-end">
-          <div
-            className="cursor-pointer font-bold border-2 border-current px-6 py-2 hover:bg-amber-600 hover:text-white transition-all text-sm uppercase tracking-widest"
-            onClick={() => navigate("/login")}
-          >
-            LOGIN
-          </div>
+          {user ? (
+            <div
+              className="flex items-center gap-2 cursor-pointer hover:text-amber-600 transition-colors uppercase tracking-widest font-bold text-sm"
+              onClick={() => navigate("/dashboard")}
+            >
+              <FaUserCircle className="text-xl" />
+              <span>Area Ospite</span>
+            </div>
+          ) : (
+            <div
+              className="cursor-pointer font-bold border-2 border-current px-6 py-2 hover:bg-amber-600 hover:text-white transition-all text-sm uppercase tracking-widest"
+              onClick={() => navigate("/login")}
+            >
+              LOGIN
+            </div>
+          )}
         </div>
         <div
           className="lg:hidden cursor-pointer text-3xl text-black p-2"
@@ -65,7 +81,7 @@ const MyNavbar = () => {
       </div>
       <div
         className={`lg:hidden bg-white shadow-xl transition-all duration-300 overflow-hidden ${
-          isMenuOpen ? "max-h-500px border-t" : "max-h-0"
+          isMenuOpen ? "max-h-125 border-t" : "max-h-0"
         }`}
       >
         <div className="flex flex-col items-center py-8 gap-4">
@@ -79,13 +95,29 @@ const MyNavbar = () => {
               {link.label}
             </NavLink>
           ))}
+
           <div className="mt-4 w-3/4">
-            <div
-              className="cursor-pointer font-bold border-2 border-amber-600 text-amber-600 px-6 py-3 text-center uppercase tracking-widest text-sm hover:bg-amber-600 hover:text-white transition-all"
-              onClick={() => navigate("/login")}
-            >
-              LOGIN
-            </div>
+            {user ? (
+              <div
+                className="cursor-pointer font-bold bg-neutral-900 text-white px-6 py-3 text-center uppercase tracking-widest text-sm"
+                onClick={() => {
+                  navigate("/dashboard");
+                  setIsMenuOpen(false);
+                }}
+              >
+                La mia Dashboard
+              </div>
+            ) : (
+              <div
+                className="cursor-pointer font-bold border-2 border-amber-600 text-amber-600 px-6 py-3 text-center uppercase tracking-widest text-sm"
+                onClick={() => {
+                  navigate("/login");
+                  setIsMenuOpen(false);
+                }}
+              >
+                LOGIN
+              </div>
+            )}
           </div>
         </div>
       </div>

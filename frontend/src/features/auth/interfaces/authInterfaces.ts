@@ -24,3 +24,11 @@ export interface UserResponse {
   role: string;
 }
 
+export interface AuthContextType {
+  user: UserResponse | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  login: (userData: UserLogin) => Promise<void>;
+  register: (userData: UserRegister) => Promise<void>;
+  logout: () => void;
+}

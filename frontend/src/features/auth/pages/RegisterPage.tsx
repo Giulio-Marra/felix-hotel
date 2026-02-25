@@ -1,21 +1,22 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerUser } from "../services/authServices";
 import RegisterForm from "../components/RegisterForm";
 import type { UserRegister } from "../interfaces/authInterfaces";
 import MyLoader from "../../../core/components/MyLoader";
 import axios from "axios";
+import { useAuth } from "../hooks/useAuth";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { register } = useAuth();
 
   const handleRegister = async (data: UserRegister) => {
     setLoading(true);
     setError(null);
     try {
-      await registerUser(data);
+      await register(data);
       navigate("/login");
     } catch (err) {
       if (axios.isAxiosError(err)) {

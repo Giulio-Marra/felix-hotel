@@ -47,17 +47,17 @@ axiosInstance.interceptors.response.use(
           break;
         case 500:
           error.message = "Errore interno del server Felix Hotel";
-          // window.location.href = '/server-down';
+          window.location.href = '/server-down';
           break;
         default:
           error.message = data.message || "Qualcosa è andato storto";
       }
     } else if (error.request) {
       error.message = "Nessuna risposta dal server. Verifica la tua connessione o riprova più tardi.";
-      // window.location.href = '/server-down';
+      window.location.href = '/server-down';
     } else {
       error.message = "Errore nella configurazione della richiesta. Contatta l'assistenza.";
-      // window.location.href = '/server-down';
+      window.location.href = '/server-down';
     }
     return Promise.reject(error);
   }

@@ -31,8 +31,6 @@ public class JWTFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
 
-        // Se il token manca o è malformato, NON lanciare eccezioni.
-        // Passa semplicemente al filtro successivo.
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -52,7 +50,6 @@ public class JWTFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {
-            // Qui lanci l'errore solo se il token c'è ma è SCADUTO o MANOMESSO
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{\"error\": \"Token non valido\"}");
         }
@@ -62,7 +59,6 @@ public class JWTFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         AntPathMatcher pathMatcher = new AntPathMatcher();
         String path = request.getServletPath();
-
         return pathMatcher.match("/auth/**", path);
     }
 }

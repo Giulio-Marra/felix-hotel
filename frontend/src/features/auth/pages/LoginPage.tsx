@@ -1,21 +1,22 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "../services/authServices";
 import LoginForm from "../components/LoginForm";
 import type { UserLogin } from "../interfaces/authInterfaces";
 import MyLoader from "../../../core/components/MyLoader";
 import axios from "axios";
+import { useAuth } from "../hooks/useAuth";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
 
   const handleLogin = async (data: UserLogin) => {
     setLoading(true);
     setError(null);
     try {
-      await loginUser(data);
+      await login(data);
       navigate("/");
     } catch (err) {
       if (axios.isAxiosError(err)) {
