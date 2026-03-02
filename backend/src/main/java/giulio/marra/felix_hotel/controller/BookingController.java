@@ -26,7 +26,7 @@ public class BookingController {
         this.bookingItemService = bookingItemService;
     }
 
-    @GetMapping("/cart")
+    @GetMapping("/cart/my-cart")
     public BookingResponseDto getMyCart(@AuthenticationPrincipal User user) {
         return bookingService.getUserCart(user);
     }

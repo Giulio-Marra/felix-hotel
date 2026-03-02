@@ -16,8 +16,14 @@ import SearchRoomPage from "./features/rooms/pages/SearchRoomPage";
 import AuthLayout from "./core/layouts/AuthLayout";
 import LoginPage from "./features/auth/pages/LoginPage";
 import RegisterPage from "./features/auth/pages/RegisterPage";
+import BookingSummaryPage from "./features/booking/pages/BookingSummaryPage";
+import { useAuth } from "./features/auth/hooks/useAuth";
+import MyLoader from "./core/components/MyLoader";
+import BookingCartPage from "./features/booking/pages/BookingCartPage";
 
 function App() {
+  const { isLoading } = useAuth();
+
   useEffect(() => {
     AOS.init({
       duration: 1000,
@@ -25,6 +31,10 @@ function App() {
       easing: "ease-in-out",
     });
   }, []);
+
+  if (isLoading) {
+    return <MyLoader text="STIAMO CARICANDO L'APP......." />;
+  }
 
   return (
     <BrowserRouter>
@@ -35,6 +45,8 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/room/details/:id" element={<RoomDetailsPage />} />
           <Route path="/search-room" element={<SearchRoomPage />} />
+          <Route path="/booking/:id" element={<BookingSummaryPage />} />
+          <Route path="/booking/cart" element={<BookingCartPage />} />
         </Route>
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<LoginPage />} />

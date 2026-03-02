@@ -44,6 +44,7 @@ public class BookingService {
 
         List<BookingItemsResponseDto> itemDtos = booking.getItems().stream()
                 .map(item -> new BookingItemsResponseDto(
+                        item.getId(),
                         new BookingRoomResponseDto(
                                 item.getRoom().getNameRoom(),
                                 item.getRoom().getMaxOccupancy(),
@@ -162,7 +163,7 @@ public class BookingService {
         booking.setBookingDate(LocalDate.now());
         booking.setTotalPrice(totalPrice);
         Booking savedBooking = bookingRepository.save(booking);
-        
+
         for (int i = 0; i < quantity; i++) {
             BookingItem item = new BookingItem();
             item.setBooking(savedBooking);

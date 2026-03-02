@@ -37,6 +37,7 @@ axiosInstance.interceptors.response.use(
         case 401:
           localStorage.removeItem("felix_token");
          error.message = data.message || "Sessione scaduta. Effettua nuovamente il login.";
+         window.location.href = "/login";
           break;
         case 403:
           localStorage.removeItem("felix_token");

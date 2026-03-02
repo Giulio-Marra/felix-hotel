@@ -47,12 +47,16 @@ public class JWTFilter extends OncePerRequestFilter {
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            filterChain.doFilter(request, response);
+
 
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("{\"error\": \"Token non valido\"}");
+            response.setContentType("application/json"); // Aggiungi questo per Postman
+            response.getWriter().write("{\"error\": \"Token non valido o scaduto\"}");
+            return;
         }
+        
+        filterChain.doFilter(request, response);
     }
 
     @Override

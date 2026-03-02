@@ -5,6 +5,7 @@ import giulio.marra.felix_hotel.enums.BookingStatus;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,7 +26,7 @@ public class Booking {
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<BookingItem> items;
+    private List<BookingItem> items = new ArrayList<>();
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
     @JsonManagedReference

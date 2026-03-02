@@ -7,7 +7,8 @@ import type {
 import { searchRooms } from "../services/roomServices";
 import MyLoader from "../../../core/components/MyLoader";
 import SearchRoomForm from "../components/SearchRoomForm";
-import RoomCard from "../components/RoomCard";
+
+import BookingRoomCard from "../../booking/components/BookingRoomCard";
 
 const SearchRoomPage = () => {
   const location = useLocation();
@@ -79,7 +80,13 @@ const SearchRoomPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
             {rooms.map((room, index) => (
               <div key={room.id} className="group">
-                <RoomCard room={room} delay={(index * 100).toString()} />
+                <BookingRoomCard
+                  room={room}
+                  delay={(index * 100).toString()}
+                  searchFilters={
+                    filters ? { ...filters, guests: filters.guests ?? 1 } : null
+                  }
+                />
               </div>
             ))}
           </div>
